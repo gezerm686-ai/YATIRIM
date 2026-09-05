@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>YATIRIM</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="YATIRIM">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-512.png">
+
+<style>
+*{box-sizing:border-box}
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#778195;--line:#e7ebf1;--accent:#1d4ed8;--good:#15803d;--bad:#b91c1c;--shadow:0 5px 20px rgba(20,30,50,.07)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:86px}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:760px;margin:auto;padding:14px 14px 0}
+.header{display:flex;justify-content:space-between;align-items:center;padding:8px 2px 16px}
+.brand{font-size:28px;font-weight:900;letter-spacing:.5px}.subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+.iconbtn{border:0;background:#fff;border-radius:12px;padding:10px;box-shadow:var(--shadow)}
+.screen{display:none}.screen.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.section-title{font-size:16px;font-weight:800;margin-bottom:12px}
+.muted{color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px}
+.kpi small{display:block;color:var(--muted);font-size:11px}.kpi b{display:block;font-size:18px;margin-top:5px}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:10px}
+input,select,textarea{width:100%;border:1px solid #dce2ea;background:#fff;border-radius:11px;padding:11px;margin-top:5px;outline:none}
+textarea{min-height:70px;resize:vertical}
+.btn{border:0;border-radius:11px;padding:11px 14px;font-weight:800}.primary{background:var(--accent);color:#fff}.secondary{background:#eef2f7;color:#253047}.danger{background:#fee2e2;color:#991b1b}.small{padding:7px 9px;font-size:12px}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}
+.row-title{font-weight:800}.row-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.pos{color:var(--good)}.neg{color:var(--bad)}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;z-index:10;padding:7px 3px calc(7px + env(safe-area-inset-bottom))}
+.nav-inner{width:min(760px,100%);display:grid;grid-template-columns:repeat(6,1fr)}
+.nav button{border:0;background:transparent;color:#718096;padding:5px 2px;font-size:20px}.nav span{display:block;font-size:9px;margin-top:2px}.nav .on{color:var(--accent);font-weight:900}
+.donut-wrap{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap}.donut{position:relative;width:220px;height:220px}.donut svg{width:100%;height:100%;transform:rotate(-90deg)}.donut circle{fill:none;stroke-width:35}.donut .bg{stroke:#edf0f4}.center{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;pointer-events:none}.center small{font-size:11px;color:var(--muted)}.center b{font-size:19px;margin-top:4px}
+.legend{flex:1;min-width:220px}.legend .row{padding:8px 0}.dot{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:7px}
+.bar{height:9px;background:#edf0f4;border-radius:99px;overflow:hidden;margin-top:7px}.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.empty{padding:22px 5px;text-align:center;color:var(--muted)}
+.badge{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:99px;padding:3px 7px;font-size:10px;font-weight:800}
+hr{border:0;border-top:1px solid var(--line);margin:15px 0}
+@media(max-width:480px){.grid2,.filters{grid-template-columns:1fr}.donut{width:205px;height:205px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+  <div><div class="brand">YATIRIM</div><div class="subtitle">Kişisel yatırım ve bütçe takip</div></div>
+  <button class="iconbtn" onclick="backupData()">💾</button>
+</header>
+
+<section id="home" class="screen active">
+ <div class="grid2">
+  <div class="kpi"><small>Toplam Portföy</small><b id="hTotal">0 ₺</b></div>
+  <div class="kpi"><small>Toplam Maliyet</small><b id="hCost">0 ₺</b></div>
+  <div class="kpi"><small>Kâr / Zarar</small><b id="hPnl">0 ₺</b></div>
+  <div class="kpi"><small>Getiri</small><b id="hPct">0%</b></div>
+ </div>
+ <div class="card" style="margin-top:12px">
+  <div class="section-title">🥧 Portföy Dağılımı</div>
+  <div class="donut-wrap"><div class="donut" id="donut"></div><div class="legend" id="legend"></div></div>
+ </div>
+ <div class="card">
+  <div class="section-title">📅 Bu Ay</div>
+  <div class="grid2">
+   <div class="kpi"><small>Gelir</small><b id="hmIncome">0 ₺</b></div>
+   <div class="kpi"><small>Gider</small><b id="hmExpense">0 ₺</b></div>
+   <div class="kpi"><small>Yatırıma Aktarılan</small><b id="hmInvest">0 ₺</b></div>
+   <div class="kpi"><small>Ay Sonu Bakiye</small><b id="hmBalance">0 ₺</b></div>
+  </div>
+ </div>
+ <div class="card"><div class="section-title">🕘 Son İşlemler</div><div id="recent"></div></div>
+</section>
+
+<section id="add" class="screen">
+ <div class="card">
+  <div class="section-title">➕ Yatırım Ekle</div>
+  <label>Yatırım Türü<select id="iType" onchange="toggleDepositFields()">
+   <option value="gold">🪙 Altın</option><option value="stock">📈 Hisse</option><option value="fund">📊 Fon</option>
+   <option value="fx">💵 Döviz</option><option value="crypto">₿ Kripto</option><option value="deposit">🏦 Vadeli Mevduat</option><option value="other">📦 Diğer</option>
+  </select></label>
+  <label>Yatırım Adı / Kodu<input id="iName" placeholder="Örn. TI2, THYAO, Gram Altın, USD"></label>
+  <label>Banka / Kurum<input id="iBank" placeholder="Örn. İş Bankası"></label>
+  <div class="grid2"><label>İşlem Tarihi<input id="iDate" type="date"></label><label>Miktar / Adet<input id="iQty" type="number" step="any" placeholder="100"></label></div>
+  <label>Birim Alış Fiyatı<input id="iUnit" type="number" step="0.0001" placeholder="150.00"></label>
+  <label>Not<textarea id="iNote" placeholder="İsteğe bağlı"></textarea></label>
+  <div id="depositFields" style="display:none">
+   <hr><div class="section-title">🏦 Vadeli Mevduat Detayları</div>
+   <div class="grid2"><label>Ana Para<input id="dPrincipal" type="number" step="0.01"></label><label>Yıllık Faiz (%)<input id="dRate" type="number" step="0.01"></label>
+   <label>Başlangıç<input id="dStart" type="date"></label><label>Vade Sonu<input id="dEnd" type="date"></label>
+   <label>Stopaj (%)<input id="dTax" type="number" step="0.01" value="17.5"></label><label>Faiz Ödeme<select id="dPay"><option>Vade sonunda</option><option>Aylık</option></select></label></div>
+   <label>Vade Yenileme / Temdit<select id="dRoll"><option value="no">Hayır</option><option value="yes">Evet</option></select></label>
+  </div>
+  <button class="btn primary" onclick="addInvestment()">Yatırımı Kaydet</button>
+ </div>
+ <div class="card"><div class="section-title">Yatırımlar</div><div id="investmentList"></div></div>
+</section>
+
+<section id="values" class="screen">
+ <div class="card">
+  <div class="section-title">💹 Güncel Değer Gir</div>
+  <p class="muted">Her yatırımın güncel toplam değerini elle girin. Kâr/zarar buna göre hesaplanır.</p>
+  <label>Yatırım<select id="vInvestment"></select></label>
+  <div class="grid2"><label>Güncel Toplam Değer<input id="vCurrent" type="number" step="0.01" placeholder="46800"></label><label>Değer Tarihi<input id="vDate" type="date"></label></div>
+  <button class="btn primary" onclick="saveValue()">Güncel Değeri Kaydet</button>
+ </div>
+ <div class="card"><div class="section-title">Güncel Değerler</div><div id="valueList"></div></div>
+</section>
+
+<section id="portfolio" class="screen">
+ <div class="card"><div class="section-title">💼 Portföy</div><div id="portfolioList"></div></div>
+</section>
+
+<section id="analysis" class="screen">
+ <div class="card"><div class="section-title">📊 Analiz</div>
+  <div class="filters"><label>Başlangıç<input id="aStart" type="date" onchange="renderAnalysis()"></label><label>Bitiş<input id="aEnd" type="date" onchange="renderAnalysis()"></label>
+  <label>Tür<select id="aType" onchange="renderAnalysis()"><option value="">Tümü</option><option value="gold">Altın</option><option value="stock">Hisse</option><option value="fund">Fon</option><option value="fx">Döviz</option><option value="crypto">Kripto</option><option value="deposit">Vadeli</option><option value="other">Diğer</option></select></label>
+  <label>Banka<input id="aBank" oninput="renderAnalysis()" placeholder="Tümü"></label></div>
+ </div>
+ <div class="card"><div class="section-title">Özet</div><div id="analysisSummary"></div></div>
+ <div class="card"><div class="section-title">İşlem Geçmişi</div><div id="history"></div></div>
+</section>
+
+<section id="budget" class="screen">
+ <div class="card"><div class="section-title">💳 Gelir - Gider</div>
+  <div class="grid2"><div class="kpi"><small>Gelir</small><b id="bIncome">0 ₺</b></div><div class="kpi"><small>Gider</small><b id="bExpense">0 ₺</b></div><div class="kpi"><small>Yatırıma Transfer</small><b id="bTransfer">0 ₺</b></div><div class="kpi"><small>Dönem Bakiyesi</small><b id="bBalance">0 ₺</b></div></div>
+ </div>
+ <div class="card"><div class="section-title">Gelir Ekle</div><div class="grid2"><label>Tarih<input id="incDate" type="date"></label><label>Tutar<input id="incAmount" type="number" step="0.01"></label></div><label>Açıklama<input id="incNote" placeholder="Maaş / ek gelir"></label><button class="btn primary" onclick="addIncome()">Gelir Ekle</button></div>
+ <div class="card"><div class="section-title">Gider Ekle</div><div class="grid2"><label>Tarih<input id="expDate" type="date"></label><label>Tutar<input id="expAmount" type="number" step="0.01"></label></div><label>Kategori<input id="expCat" placeholder="Market, yakıt, kira..."></label><button class="btn primary" onclick="addExpense()">Gider Ekle</button></div>
+ <div class="card"><div class="section-title">Yatırıma Para Aktar</div><div class="grid2"><label>Tarih<input id="trDate" type="date"></label><label>Tutar<input id="trAmount" type="number" step="0.01"></label></div><label>Açıklama<input id="trNote" placeholder="Birikim / yatırım"></label><button class="btn primary" onclick="addTransfer()">Transfer Ekle</button></div>
+ <div class="card"><div class="section-title">🔄 Aylık Devreden Bakiye</div><p class="muted">Pozitif veya negatif bakiye girebilirsiniz.</p><div class="grid2"><label>Ay<input id="carryMonth" type="month"></label><label>Tutar<input id="carryAmount" type="number" step="0.01"></label></div><button class="btn primary" onclick="saveCarry()">Devreden Bakiyeyi Kaydet</button><div id="carryList" style="margin-top:10px"></div></div>
+ <div class="card"><div class="section-title">Hareketler</div><div id="budgetList"></div></div>
+</section>
+</div>
+
+<nav class="nav"><div class="nav-inner">
+ <button class="on" onclick="show('home',this)">🏠<span>Ana</span></button>
+ <button onclick="show('add',this)">➕<span>Ekle</span></button>
+ <button onclick="show('values',this)">💹<span>Güncel</span></button>
+ <button onclick="show('portfolio',this)">💼<span>Portföy</span></button>
+ <button onclick="show('analysis',this)">📊<span>Analiz</span></button>
+ <button onclick="show('budget',this)">💳<span>Bütçe</span></button>
+</div></nav>
+
+<script>
+const KEY='YATIRIM_ULTIMATE_V1';
+const TYPES={gold:'🪙 Altın',stock:'📈 Hisse',fund:'📊 Fon',fx:'💵 Döviz',crypto:'₿ Kripto',deposit:'🏦 Vadeli Mevduat',other:'📦 Diğer'};
+const COLORS=['#1d4ed8','#15803d','#d97706','#7c3aed','#dc2626','#0891b2','#64748b'];
+function blank(){return{investments:[],values:[],income:[],expenses:[],transfers:[],carry:[],deposits:[]}}
+function load(){try{let d=JSON.parse(localStorage.getItem(KEY));if(d)return Object.assign(blank(),d)}catch(e){}return blank()}
+function save(d){localStorage.setItem(KEY,JSON.stringify(d));renderAll()}
+function id(){return Date.now()+'_'+Math.random().toString(36).slice(2)}
+function money(n){return new Intl.NumberFormat('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(n)||0)+' ₺'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function today(){return new Date().toISOString().slice(0,10)}
+function month(){return today().slice(0,7)}
+function show(idv,btn){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(idv).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));if(btn)btn.classList.add('on');renderAll()}
+function toggleDepositFields(){document.getElementById('depositFields').style.display=document.getElementById('iType').value==='deposit'?'block':'none'}
+function addInvestment(){
+ let d=load(),type=iType.value,name=iName.value.trim(),bank=iBank.value.trim(),date=iDate.value||today(),qty=+iQty.value||0,unit=+iUnit.value||0;
+ if(!name){alert('Yatırım adı/kodu girin.');return}
+ let x={id:id(),type,name,bank,date,qty,unit,cost:qty*unit,note:iNote.value.trim()};
+ if(type==='deposit'){x.principal=+dPrincipal.value||x.cost;x.rate=+dRate.value||0;x.start=dStart.value||date;x.end=dEnd.value||date;x.tax=+dTax.value||0;x.pay=dPay.value;x.roll=dRoll.value}
+ d.investments.push(x); if(type==='deposit')d.deposits.push(x); save(d); document.querySelectorAll('#add input,#add textarea').forEach(e=>{if(e.id!=='iDate')e.value=''}); iDate.value=today(); alert('Yatırım kaydedildi.')}
+function deleteInvestment(idv){let d=load();d.investments=d.investments.filter(x=>x.id!==idv);d.values=d.values.filter(x=>x.investmentId!==idv);save(d)}
+function saveValue(){let d=load(),iid=vInvestment.value,val=+vCurrent.value;if(!iid||val<0){alert('Yatırım ve güncel değer girin.');return}let x=d.values.find(v=>v.investmentId===iid);if(x){x.current=val;x.date=vDate.value||today()}else d.values.push({id:id(),investmentId:iid,current:val,date:vDate.value||today()});save(d);vCurrent.value='';alert('Güncel değer kaydedildi.')}
+function portfolio(){
+ let d=load(),vm=new Map(d.values.map(v=>[v.investmentId,+v.current||0])),cost=0,current=0,types={};
+ d.investments.forEach(x=>{cost+=+x.cost||0;let v=vm.get(x.id)||0;current+=v;if(v>0)types[x.type]=(types[x.type]||0)+v});
+ return{d,vm,cost,current,pnl:current-cost,pct:cost?(current-cost)/cost*100:0,types}
+}
+function renderHome(){
+ let p=portfolio();hTotal.textContent=money(p.current);hCost.textContent=money(p.cost);hPnl.textContent=(p.pnl>=0?'+':'')+money(p.pnl);hPnl.className=p.pnl>=0?'pos':'neg';hPct.textContent=(p.pct>=0?'+':'')+p.pct.toFixed(2).replace('.',',')+'%';
+ let total=p.current,arr=Object.entries(p.types).sort((a,b)=>b[1]-a[1]),r=73,c=2*Math.PI*r,off=0,svg=`<svg viewBox="0 0 210 210"><circle class="bg" cx="105" cy="105" r="${r}"></circle>`;
+ if(total){arr.forEach(([t,v],i)=>{let len=c*v/total,g=Math.min(3,len/10);svg+=`<circle cx="105" cy="105" r="${r}" stroke="${COLORS[i%COLORS.length]}" stroke-dasharray="${Math.max(0,len-g)} ${c-Math.max(0,len-g)}" stroke-dashoffset="${-off}"></circle>`;off+=len});svg+='</svg>';donut.innerHTML=svg+`<div class="center"><small>Toplam Portföy</small><b>${money(total)}</b></div>`;legend.innerHTML=arr.map(([t,v],i)=>`<div class="row"><span><i class="dot" style="background:${COLORS[i%COLORS.length]}"></i>${TYPES[t]||t}</span><b>${money(v)} · %${(v/total*100).toFixed(1).replace('.',',')}</b></div>`).join('')}else{donut.innerHTML='<div class="empty">🥧<br>Henüz güncel değer girilmedi.</div>';legend.innerHTML=''}
+ let m=month(),inc=d.income.filter(x=>x.date.startsWith(m)).reduce((a,x)=>a+x.amount,0),exp=d.expenses.filter(x=>x.date.startsWith(m)).reduce((a,x)=>a+x.amount,0),tr=d.transfers.filter(x=>x.date.startsWith(m)).reduce((a,x)=>a+x.amount,0),carry=d.carry.filter(x=>x.month===m).reduce((a,x)=>a+x.amount,0);
+ hmIncome.textContent=money(inc);hmExpense.textContent=money(exp);hmInvest.textContent=money(tr);hmBalance.textContent=money(carry+inc-exp-tr);
+ let events=[...d.income.map(x=>({date:x.date,text:'Gelir · '+x.note,amt:x.amount})),...d.expenses.map(x=>({date:x.date,text:'Gider · '+x.cat,amt:-x.amount})),...d.transfers.map(x=>({date:x.date,text:'Yatırım transferi · '+x.note,amt:-x.amount}))].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+ recent.innerHTML=events.length?events.map(e=>`<div class="row"><div><b>${esc(e.text)}</b><div class="row-sub">${e.date}</div></div><b class="${e.amt>=0?'pos':'neg'}">${e.amt>=0?'+':''}${money(e.amt)}</b></div>`).join(''):'<div class="empty">Henüz işlem yok.</div>';
+}
+function renderInvestments(){
+ let d=load();investmentList.innerHTML=d.investments.length?d.investments.slice().reverse().map(x=>`<div class="row"><div><div class="row-title">${TYPES[x.type]||'📦'} ${esc(x.name)}</div><div class="row-sub">${esc(x.bank||'Kurum yok')} · ${x.qty||0} · Maliyet ${money(x.cost)}</div></div><button class="btn danger small" onclick="deleteInvestment('${x.id}')">Sil</button></div>`).join(''):'<div class="empty">Yatırım eklenmedi.</div>'}
+function renderValues(){
+ let d=load();vInvestment.innerHTML='<option value="">Yatırım seçin</option>'+d.investments.map(x=>`<option value="${x.id}">${TYPES[x.type]||'📦'} ${esc(x.name)}${x.bank?' · '+esc(x.bank):''}</option>`).join('');
+ valueList.innerHTML=d.values.length?d.values.slice().reverse().map(v=>{let x=d.investments.find(i=>i.id===v.investmentId);if(!x)return'';let pnl=v.current-x.cost,pct=x.cost?pnl/x.cost*100:0;return `<div class="row"><div><div class="row-title">${TYPES[x.type]||'📦'} ${esc(x.name)}</div><div class="row-sub">${v.date} · Maliyet ${money(x.cost)}</div></div><div style="text-align:right"><b>${money(v.current)}</b><div class="${pnl>=0?'pos':'neg'}" style="font-size:11px">${pnl>=0?'+':''}${money(pnl)} (${pct>=0?'+':'')}${pct.toFixed(2)}%</div></div></div>`}).join(''):'<div class="empty">Henüz güncel değer girilmedi.</div>'}
+function renderPortfolio(){let p=portfolio();portfolioList.innerHTML=p.d.investments.length?p.d.investments.map(x=>{let cur=p.vm.get(x.id)||0,pnl=cur-x.cost,pct=x.cost?pnl/x.cost*100:0;return `<div class="row"><div><div class="row-title">${TYPES[x.type]||'📦'} ${esc(x.name)}</div><div class="row-sub">${esc(x.bank||'')} · ${x.date} · Maliyet ${money(x.cost)}</div></div><div style="text-align:right"><b>${money(cur)}</b><div class="${pnl>=0?'pos':'neg'}" style="font-size:11px">${pnl>=0?'+':''}${money(pnl)} · ${pct.toFixed(2)}%</div></div></div>`}).join(''):'<div class="empty">Portföy boş.</div>'}
+function renderAnalysis(){
+ let d=load(),s=aStart.value,e=aEnd.value,t=aType.value,b=aBank.value.trim().toLowerCase(),xs=d.investments.filter(x=>(!s||x.date>=s)&&(!e||x.date<=e)&&(!t||x.type===t)&&(!b||(x.bank||'').toLowerCase().includes(b))),cost=xs.reduce((a,x)=>a+x.cost,0),vm=new Map(d.values.map(v=>[v.investmentId,+v.current||0])),cur=xs.reduce((a,x)=>a+(vm.get(x.id)||0),0),pnl=cur-cost;
+ analysisSummary.innerHTML=`<div class="grid2"><div class="kpi"><small>Yatırım Sayısı</small><b>${xs.length}</b></div><div class="kpi"><small>Maliyet</small><b>${money(cost)}</b></div><div class="kpi"><small>Güncel</small><b>${money(cur)}</b></div><div class="kpi"><small>Kâr/Zarar</small><b class="${pnl>=0?'pos':'neg'}">${pnl>=0?'+':''}${money(pnl)}</b></div></div>`;
+ history.innerHTML=xs.length?xs.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<div class="row"><div><b>${TYPES[x.type]||'📦'} ${esc(x.name)}</b><div class="row-sub">${x.date} · ${esc(x.bank||'')} · ${x.qty||0} adet/miktar</div></div><b>${money(x.cost)}</b></div>`).join(''):'<div class="empty">Filtreye uygun kayıt yok.</div>';
+}
+function addIncome(){let d=load(),a=+incAmount.value;if(a<=0)return;d.income.push({id:id(),date:incDate.value||today(),amount:a,note:incNote.value.trim()});save(d);incAmount.value='';incNote.value=''}
+function addExpense(){let d=load(),a=+expAmount.value;if(a<=0)return;d.expenses.push({id:id(),date:expDate.value||today(),amount:a,cat:expCat.value.trim()||'Diğer'});save(d);expAmount.value='';expCat.value=''}
+function addTransfer(){let d=load(),a=+trAmount.value;if(a<=0)return;d.transfers.push({id:id(),date:trDate.value||today(),amount:a,note:trNote.value.trim()||'Yatırım'});save(d);trAmount.value='';trNote.value=''}
+function saveCarry(){let d=load(),m=carryMonth.value||month(),a=+carryAmount.value;if(!a&&!confirm('0 ₺ devreden bakiye kaydedilsin mi?'))return;let x=d.carry.find(v=>v.month===m);if(x)x.amount=a;else d.carry.push({month:m,amount:a});save(d);carryAmount.value=''}
+function renderBudget(){
+ let d=load(),m=month(),inc=d.income.filter(x=>x.date.startsWith(m)).reduce((a,x)=>a+x.amount,0),exp=d.expenses.filter(x=>x.date.startsWith(m)).reduce((a,x)=>a+x.amount,0),tr=d.transfers.filter(x=>x.date.startsWith(m)).reduce((a,x)=>a+x.amount,0),carry=d.carry.filter(x=>x.month===m).reduce((a,x)=>a+x.amount,0);
+ bIncome.textContent=money(inc);bExpense.textContent=money(exp);bTransfer.textContent=money(tr);bBalance.textContent=money(carry+inc-exp-tr);
+ carryList.innerHTML=d.carry.length?d.carry.slice().sort((a,b)=>b.month.localeCompare(a.month)).map(x=>`<div class="row"><span>${x.month}</span><b class="${x.amount>=0?'pos':'neg'}">${x.amount>=0?'+':''}${money(x.amount)}</b></div>`).join(''):'';
+ let all=[...d.income.map(x=>({date:x.date,text:'Gelir · '+x.note,amt:x.amount})),...d.expenses.map(x=>({date:x.date,text:'Gider · '+x.cat,amt:-x.amount})),...d.transfers.map(x=>({date:x.date,text:'Yatırım · '+x.note,amt:-x.amount}))].sort((a,b)=>b.date.localeCompare(a.date));
+ budgetList.innerHTML=all.length?all.map(x=>`<div class="row"><div><b>${esc(x.text)}</b><div class="row-sub">${x.date}</div></div><b class="${x.amt>=0?'pos':'neg'}">${x.amt>=0?'+':''}${money(x.amt)}</b></div>`).join(''):'<div class="empty">Hareket yok.</div>';
+}
+function renderAll(){renderHome();renderInvestments();renderValues();renderPortfolio();renderAnalysis();renderBudget()}
+function setDates(){[iDate,vDate,incDate,expDate,trDate].forEach(e=>{if(e)e.value=today()});carryMonth.value=month()}
+function backupData(){let blob=new Blob([JSON.stringify(load(),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='YATIRIM_yedek_'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+setDates();renderAll();
+
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
