@@ -328,7 +328,7 @@ function renderValues(){
       <div class="row-sub">${v.date} · Maliyet ${money(x.cost)}</div></div>
       <div style="text-align:right"><b>${money(v.current)}</b>
       <div class="${pnl>=0?'pos':'neg'}" style="font-size:11px">${pnl>=0?'+':''}${money(pnl)}
-      (${pct>=0?'+':'')}${pct.toFixed(2)}%</div></div></div>`;
+      (${pct>=0?'+':''}${pct.toFixed(2)}%</div></div></div>`;
   }).join(''):'<div class="empty">Henüz güncel değer girilmedi.</div>';
 }
 
